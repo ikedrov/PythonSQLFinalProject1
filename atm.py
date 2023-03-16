@@ -7,6 +7,7 @@ class Atm:
 
         SqlAtm.create_table()
 #        SqlAtm.add_users((1234, 1111, 10000))
+#        SqlAtm.add_users((2345, 2222, 10000))
         card_number = input('Card number: ')
         while True:
             if SqlAtm.card_input(card_number):
