@@ -5,8 +5,11 @@
  - в описание "5. Перевести денежные средства.
  - в условия данный метод должен запускаться если пользователь ввел "5"
 '''
-
+import csv
+import datetime
 import sqlite3
+
+now_date = datetime.datetime.utcnow().strftime('%H:%M-%d.%m.%Y')
 
 
 class SqlAtm:
@@ -95,6 +98,7 @@ class SqlAtm:
                     cur.execute(f'''UPDATE Users_data SET Balance = Balance - {amount} WHERE Card_number = {card_number}''')
                     db.commit()
                     SqlAtm.balance_info(card_number)
+                    SqlAtm.operation_report_1(now_date, card_number, '1', amount, '')
                     return True
             except:
                 print('Invalid input')
@@ -110,6 +114,7 @@ class SqlAtm:
                 cur.execute(f'''UPDATE Users_data SET Balance = Balance + {amount} WHERE Card_number = {card_number}''')
                 db.commit()
                 SqlAtm.balance_info(card_number)
+                SqlAtm.operation_report_1(now_date, card_number, '2', amount, '')
                 return True
             except:
                 print('Invalid input')
@@ -144,6 +149,7 @@ class SqlAtm:
                     cur.execute(
                         f'''UPDATE Users_data SET Balance = Balance + {amount} WHERE Card_number = {transfer_card}''')
                     db.commit()
+                    SqlAtm.operation_report_1(now_date, card_number, '3', amount, '')
                     print('Operation completed')
                     return True
             except:
@@ -174,3 +180,23 @@ class SqlAtm:
                 SqlAtm.transfer_money(card_number)
             else:
                 print('Invalid operation')
+
+    @staticmethod
+    def operation_report_1(now_date, card_number, operation_type, amount, payee):
+
+        user_data = [
+            (now_date, card_number, operation_type, amount, payee)
+        ]
+
+        with open('report_1.csv', 'a', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerows(
+                user_data
+            )
+        print('Data added to report')
+
+'''Operation types
+1. Cash withdraw
+2. Cash deposit
+3. Cash transfer'''
+#SqlAtm.operation_report_1()
