@@ -5,6 +5,17 @@
  - в описание "5. Перевести денежные средства.
  - в условия данный метод должен запускаться если пользователь ввел "5"
 '''
+'''1. Добавить в метод transfer_money метод report_operation_1, для фиксации отправки денежных средств другому клиенту
+тип операции - type_operation = 3. Проверить что данный метод работает корректно
+2. Создать файл report_2.csv, включающий поля Date, Payee, Type operation, Amount, Sender.
+3. Создать метод report_operation_2, который будет принимать в себя следующие значения и помещать в report_2.csv
+при успешной прохожднии операции по переводу денежных средств:
+Data - now_date,
+Payee - payee,
+Type operation - type_operation, 3
+Amount - amount,
+Sender - number_card (отправитель)
+4. Добавить в метод transfer_money метод report_operation_2'''
 import csv
 import datetime
 import sqlite3
@@ -133,7 +144,6 @@ class SqlAtm:
             cur.execute('''SELECT Card_number FROM Users_data''')
             card_info_result = cur.fetchall()
             cards_info = card_info_result
-            print(cards_info)
             try:
                 if int(amount) > card_balance:
                     print('Not enough money')
@@ -150,6 +160,7 @@ class SqlAtm:
                         f'''UPDATE Users_data SET Balance = Balance + {amount} WHERE Card_number = {transfer_card}''')
                     db.commit()
                     SqlAtm.operation_report_1(now_date, card_number, '3', amount, '')
+                    SqlAtm.operation_report_2(now_date, transfer_card, '3', amount, card_number)
                     print('Operation completed')
                     return True
             except:
@@ -195,8 +206,22 @@ class SqlAtm:
             )
         print('Data added to report')
 
+    @staticmethod
+    def operation_report_2(now_date, payee, operation_type, amount, sender):
+
+        user_data = [
+            (now_date, payee, operation_type, amount, sender)
+        ]
+
+        with open('report_2.csv', 'a', newline='') as file:
+            writer = csv.writer(file, delimiter=';')
+            writer.writerows(
+                user_data
+            )
+        print('Data added to report')
+
 '''Operation types
 1. Cash withdraw
 2. Cash deposit
 3. Cash transfer'''
-#SqlAtm.operation_report_1()
+#SqlAtm.operation_report_2()
